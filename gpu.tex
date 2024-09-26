@@ -1,0 +1,31 @@
+\documentclass{beamer}
+\usepackage[latin1]{inputenc}
+%\usetheme{Warsaw}             % Themes are listed here: https://latex-beamer.com/tutorials/beamer-themes/ 
+\usetheme{Madrid}
+\usepackage{multirow}
+\definecolor{links}{HTML}{2A1B81}
+\hypersetup{colorlinks,linkcolor=,urlcolor=links}
+\newcommand{\CC}{\texttt{C}\nolinebreak\hspace{-.05em}\raisebox{.4ex}{\tiny\bf +}\nolinebreak\hspace{-.10em}\raisebox{.4ex}{\tiny\bf +}}
+
+\title{Introduction to GPU Programming}
+%\subtitle{}
+\author{Wim R.M. Cardoen, PhD}
+\institute{Center of High-Performance Computing (CHPC) \\ University of Utah}
+\date{October 14, 2024}
+
+\begin{document}        % Begin Document
+
+% --- PRELUDE ---
+\include{title}         % Title
+\include{outline}       % Table of Contents - Outline
+
+% --- BODY ---
+\include{motivation}    % Motivation
+\include{hardware}      % GPU Architecture
+\include{software}      % Software
+\include{chpc}          % Use of GPUs at the CHPC
+
+% --- END ---
+\include{question}      % Questions
+
+\end{document}          % End Document
