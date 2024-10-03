@@ -34,6 +34,20 @@
 %         
 % Step 3: Introduces the concept of shared memory (+__syncthreads())
 
+\subsection{Warps}
+\begin{frame}
+\frametitle{GPU Threads - Warps}
+\begin{itemize}
+  \item Each SMP:
+  \begin{itemize}
+     \item generates, schedules, executes threads in batches of $32$ threads.
+     \item \textbf{WARP}: a batch of $32$ threads
+  \end{itemize}
+  \item each thread in a WARP executes the same instructions but runs its own "path".
+  \item if threads within a WARP diverge, the threads become inactive/disabled.
+\end{itemize}
+\end{frame}
+
 
 % Compilation of the CUDA code
 %   introducing -compute, -arch
