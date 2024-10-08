@@ -3,9 +3,51 @@
 %\usetheme{Warsaw}             % Themes are listed here: https://latex-beamer.com/tutorials/beamer-themes/ 
 \usetheme{Madrid}
 \usepackage{multirow}
+\usepackage{listings}
 \definecolor{links}{HTML}{2A1B81}
 \hypersetup{colorlinks,linkcolor=,urlcolor=links}
 \newcommand{\CC}{\texttt{C}\nolinebreak\hspace{-.05em}\raisebox{.4ex}{\tiny\bf +}\nolinebreak\hspace{-.10em}\raisebox{.4ex}{\tiny\bf +}}
+
+\AtBeginSection[]{
+  \begin{frame}
+  \vfill
+  \centering
+  \begin{beamercolorbox}[sep=8pt,center,shadow=true,rounded=true]{title}
+    \usebeamerfont{title}\insertsectionhead\par%
+  \end{beamercolorbox}
+  \vfill
+  \end{frame}
+}
+
+\definecolor{BrickRed}{rgb}{0.8,0.25,0.33}
+\definecolor{ForestGreen}{rgb}{0.13,0.55,0.13}
+\definecolor{RoyalBlue}{rgb}{0.25,0.41,0.88}
+
+\lstdefinestyle{MyCudaStyle}{
+  %backgroundcolor=\color{white},
+  basicstyle=\small\ttfamily,
+  %breakatwhitespace=false,
+  %breaklines=true,
+  morekeywords={None},
+  captionpos=b,
+  commentstyle=\color{RoyalBlue},   % comment style
+  frame=single,
+  keywordstyle=\color{ForestGreen}\bfseries,      % keyword style
+  language=C,
+  showstringspaces=false,
+  stringstyle=\color{BrickRed},
+  emph={%
+        cudaFree, cudaMalloc, cudaError\_t, cudaSuccess, 
+	size\_t,
+	cudaMemcpy, cudaMemcpyKind,
+	cudaMemcpyHostToHost, cudaMemcpyHostToDevice, 
+	cudaMemcpyDeviceToHost, cudaMemcpyDeviceToDevice,
+	\_\_global\_\_, \_\_device\_\_ ,\_\_host\_\_,<<<,>>>,
+	dim3,\_\_shared\_\_,\_\_syncthreads,
+	uint3,gridDim,blockIdx,blockDim,threadIdx, 
+	%
+        }, emphstyle={\color{ForestGreen}\bfseries}
+}
 
 \title{Introduction to GPU Programming}
 %\subtitle{}
@@ -23,6 +65,7 @@
 \include{motivation}    % Motivation
 \include{hardware}      % GPU Architecture
 \include{software}      % Software
+\include{software2}
 \include{chpc}          % Use of GPUs at the CHPC
 
 % --- END ---

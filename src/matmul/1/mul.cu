@@ -11,4 +11,3 @@ __global__ void MatrixMulKernel1(double *M_d, double *N_d,
     P_d[tx+ty*SZ]=Pval;    
     return;
 }
-

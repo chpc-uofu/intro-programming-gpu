@@ -19,59 +19,136 @@
 	         \item CUDA API: extension of the \texttt{C} language.
                  \item handles the GPU thread level parallelism
                  \item deals with moving data between CPU and GPU.
-		 \item also support for \CC\,, \texttt{Fortran}.			 
+		 \item also support for \CC\,, \texttt{Fortran} and \texttt{Python}.			 
               \end{itemize}			 
      \end{itemize}		     
-\end{frame}	
+\end{frame} 
 
-% Matrix Multiplication
-%   consists of concepts of threads.
-\subsection{Introducing CUDA concepts: case of matrix mul.}
-% Step 1: consists of the concept of a kernel (__device__,__global__,..), threads
-%         and how to transfer the data from the GPU and CPU. 
-%         cudaMalloc, cudaMallocManaged (unified memory)
-% Step 2: introduces the concept of the blocks and grids
-%         
-% Step 3: Introduces the concept of shared memory (+__syncthreads())
-
-\subsection{Warps}
+\subsection{Structure of a GPU computation}
 \begin{frame}
-\frametitle{GPU Threads - Warps}
-\begin{itemize}
-  \item Each SMP:
-  \begin{itemize}
-     \item generates, schedules, executes threads in batches of $32$ threads.
-     \item \textbf{WARP}: a batch of $32$ threads
-  \end{itemize}
-  \item each thread in a WARP executes the same instructions but runs its own "path".
-  \item if threads within a WARP diverge, the threads become inactive/disabled.
-\end{itemize}
+   \frametitle{Structure of a GPU computation}
+      \begin{enumerate}
+	 \item \textbf{\textcolor{blue}{Allocate}} memory space on the GPU device.		      
+	 \item \textbf{\textcolor{blue}{Transfer}} the data from the CPU to the GPU device. 
+	 \item Perform the \textbf{\textcolor{blue}{calculation}} on the GPU device.
+            \begin{itemize} 		 
+	       \item \textbf{\textcolor{blue}{kernel}}: function executed on the GPU.
+               \item To enhance performance: keep data as long as possible on the GPU device.
+	    \end{itemize}
+         \item \textbf{\textcolor{blue}{Transfer}} the result back from the GPU device to the CPU.
+	 \item \textbf{\textcolor{blue}{Deallocate}} memory space on the GPU device.		 
+      \end{enumerate}
+      \textbf{\textcolor{orange}{Note}}: source code \& makefile available in \texttt{./src}	
 \end{frame}
 
 
-% Compilation of the CUDA code
-%   introducing -compute, -arch
-\subsection{Compiling CUDA code \& useful env. variables} 
-
-%   nvprof, nvsight, cuda-gdb
-\subsection{Debugging \& profiling your CUDA code}
-
-% CUDA Libraries: CUBLAS, CUFFT, CUDNN, MAGMA, CURAND, NCCL
-\subsection{Important CUDA Libraries}
-
-% Alternatives:
-%  - Within CUDA: CudaFortran, OpenAcc (pragmas)
-%  - Alternatives to CUDA: OpenCL, HIP
-%  - Kokkos
-\subsection{Alternatives for CUDA}
-
-\subsection{Links}
+% Allocate & deallocate of GLOBAL memory
 \begin{frame}
-   \frametitle{Links}
-      \begin{itemize}
-	      \item \href{https://docs.nvidia.com/cuda/index.html}{CUDA Toolkit Documentation}
-              \item \href{https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html}{CUDA \CC\, Programming Guide}
-	      \item \href{https://docs.nvidia.com/cuda/cuda-c-best-practices-guide/index.html}{CUDA \CC\, Best Practices Guide}	      
-      \end{itemize}		      
+   \frametitle{Alloc. \& free of global memory on the GPU}
+   \begin{itemize}
+         \item \lstinline[style=MyCudaStyle]|cudaError\_t| \\
+		 CUDA Error types.
+	 \item \lstinline[style=MyCudaStyle]|cudaError\_t cudaMalloc(void **devPtr, size\_t size)| \\
+		 Allocates memory on the device.
+	 \item \lstinline[style=MyCudaStyle]|cudaError\_t cudaFree(void *devPtr)| \\
+		 Frees memory on the device.
+   \end{itemize}
+\end{frame} 
+
+\begin{frame}
+   \lstinputlisting[style=MyCudaStyle,basicstyle=\tiny, caption={\texttt{Alloc/Free extract}}]{./latexinc/ex1.cu}
 \end{frame}	
+
+
+% Copy data between host and device
+\begin{frame}
+   \frametitle{Copy data between host (CPU) and device (GPU)}
+       \begin{itemize}
+          \item Copy data bewteen host (CPU) and device (CPU) \\		       
+                \lstinputlisting[style=MyCudaStyle]{./latexinc/memcpy.cu}
+  	  \item Direction (\lstinline[style=MyCudaStyle]|kind|):
+             \begin{itemize}
+	        \item \lstinline[style=MyCudaStyle]|cudaMemcpyHostToHost|		     
+                \item \lstinline[style=MyCudaStyle]|cudaMemcpyHostToDevice|
+	        \item \lstinline[style=MyCudaStyle]|cudaMemcpyDeviceToHost|
+	        \item \lstinline[style=MyCudaStyle]|cudaMemcpyDeviceToDevice|		
+             \end{itemize}			     
+       \end{itemize}		  
+\end{frame} 
+
+\begin{frame}
+   \lstinputlisting[style=MyCudaStyle,basicstyle=\tiny, caption={\texttt{cudaMemcpy extract}}]{./latexinc/ex2.cu}
+\end{frame}
+
+
+% Kernel
+\begin{frame}
+   \frametitle{CUDA Kernel}
+      \begin{itemize}	
+	      \item \textbf{\textcolor{blue}{CUDA kernel}}: alias for a function which may run on a GPU device.
+	 \item \textbf{\textcolor{blue}{Kernel declaration}} syntax:\\
+	       \hspace{6ex}\textit{funcspec} \lstinline[style=MyCudaStyle]|void| \textit{kernelName}(\textit{args})\{ \textit{body} \} \\
+               where:
+               \begin{itemize}
+		  \item \textit{funcspec}: function type qualifier, i.e.\\\lstinline[style=MyCudaStyle]|\_\_global\_\_,\_\_host\_\_,\_\_device\_\_|
+                  \item \textit{kernelName}: name of the kernel/CUDA function.
+                  \item \textit{args}: argument list of the kernel/CUDA function.
+                  \item \textit{body}: body of the kernel/CUDA function (your code).			  
+	       \end{itemize}
+       \item \textbf{\textcolor{blue}{Kernel call}} syntax:\\
+		 \hspace{6ex}\textit{kernelName}\texttt{<<<}\textit{gridSize,blockSize}\texttt{>>>}(\textit{args})\\
+               where:
+               \begin{itemize}
+		  \item \textit{gridSize}: size of the grid of thread blocks.
+		  \item \textit{blockSize}: size of a thread block.		       
+               \end{itemize}			       
+      \end{itemize}
+\end{frame}	
+
+% Kernel (Part 2).
+\begin{frame}
+   \frametitle{Function type qualifiers}
+      \begin{table}[H]
+	 \begin{center}      
+  	    \begin{tabular}{l|l|l}
+            Qualifier                                    & Called from  & Executed on   \\
+               \hline		
+	   \lstinline[style=MyCudaStyle]|\_\_global\_\_| & host         & device\\
+ 	   \lstinline[style=MyCudaStyle]|\_\_host\_\_|   & host         & host \\
+           \lstinline[style=MyCudaStyle]|\_\_device\_\_| & device       & device \\ 
+               \hline
+            \end{tabular}
+         \end{center}
+	 \caption{Function type qualifiers}
+      \end{table}
+      \textbf{\textcolor{orange}{Note:}}\\  	
+      \begin{itemize}
+         \item You can have to different versions of a function i.e.:\\
+	       one with \lstinline[style=MyCudaStyle]|\_\_host\_\_|  \& one with \lstinline[style=MyCudaStyle]|\_\_device\_\_|
+      \end{itemize}		      
+\end{frame}
+
+% Grid, Blocks and Threads
+\begin{frame}
+     \frametitle{Grids, Blocks and Threads}
+        We have a hierarchical (software) implementation.
+     \begin{itemize}
+        \item \lstinline[style=MyCudaStyle]|uint3,dim3|:
+           \begin{itemize}
+              \item CUDA defined structures of unsigned integer \lstinline[style=MyCudaStyle]|x,y,z|
+              \item \lstinline[style=MyCudaStyle]|dim3|: based on \lstinline[style=MyCudaStyle]|uint3|
+                    but unspecified components are initialized to $1$.
+           \end{itemize}
+        \item \textbf{\textcolor{blue}{Grid}}: each Grid consists of Blocks
+           \begin{itemize}
+              \item \lstinline[style=MyCudaStyle]|dim3 gridDim|: dimensions of the Grid.
+              \item \lstinline[style=MyCudaStyle]|uint3 blockIdx|: block index within the Grid.
+           \end{itemize}
+        \item \textbf{\textcolor{blue}{Block}}: each Block consists of Threads
+           \begin{itemize}
+              \item \lstinline[style=MyCudaStyle]|dim3 blockDim|: dimensions of the Block
+              \item \lstinline[style=MyCudaStyle]|uint3 threadIdx|: thread index within the block.
+           \end{itemize}
+     \end{itemize}
+\end{frame}
 
