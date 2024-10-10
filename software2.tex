@@ -142,29 +142,6 @@
       \end{itemize}
 \end{frame}	
 
-% https://docs.nvidia.com/cuda/cuda-compiler-driver-nvcc/index.html#gpu-compilation
-\begin{frame}
-   \frametitle{Some recent CUDA Architectures}
-      \begin{table}[H]
-         \begin{center}
-            \begin{tabular}{c|c|c|c}
-		    Architecture            & Year & \texttt{compute\_} & \texttt{sm\_} \\
-	           \hline
-		      \texttt{Maxwell}      & 2014 & 50, 52, 53    & 50, 52, 53   \\ 
-		      \texttt{Pascal}       & 2016 & 60, 61, 62    & 60, 61, 62 \\
-		      \texttt{Volta}        & 2017 & 70, 72        & 70, 72 \\
-		      \texttt{Turing}       & 2018 & 75            & 75 \\
-		      \texttt{Ampere}       & 2020 & 80, 86, 87    & 80, 86, 87 \\
-		      \texttt{Ada Lovelace} & 2022 & 89            & 89\\
-		      \texttt{Hopper}       & 2022 & 90, 90a       & 90, 90a \\
-	           \hline
-            \end{tabular}
-         \end{center}
-         \caption{\small{Some of the recent CUDA architectures (10/08/2024)}}	      
-      \end{table}
-\end{frame}	
-
-
 \begin{frame}
    \frametitle{Compilation trajectory (cont.)}
       \begin{columns}
@@ -178,17 +155,108 @@
 \end{frame}     
 
 
-% Still to be done
-
+% Still to be finished
 \begin{frame}
-   \frametitle{In praxi}
+   \frametitle{In praxi,}
+      We will now address the following questions:
       \begin{itemize}  	
-         \item What are the existing CUDA architectures?
-         \item How find the architecture of a machine?
-         \item How to build for a particular architecture?
-         \item How to build for multiple architectures?		 
+         \item What are the recent CUDA architectures?
+	 \item How to find the compute capability (CC) of a device?
+         \item How to build an executable for a particular architecture?
+         \item How to build an executable for multiple architectures?		 
       \end{itemize} 
 \end{frame}
+
+
+% https://docs.nvidia.com/cuda/cuda-compiler-driver-nvcc/index.html#gpu-compilation
+\begin{frame}
+  \frametitle{Recent CUDA Architectures}
+      \begin{table}[H]
+         \begin{center}
+            \begin{tabular}{c|c|c|c}
+                    Architecture            & Year & \texttt{compute\_} & \texttt{sm\_} \\
+                   \hline
+                      \texttt{Maxwell}      & 2014 & 50, 52, 53    & 50, 52, 53   \\
+                      \texttt{Pascal}       & 2016 & 60, 61, 62    & 60, 61, 62 \\
+                      \texttt{Volta}        & 2017 & 70, 72        & 70, 72 \\
+                      \texttt{Turing}       & 2018 & 75            & 75 \\
+                      \texttt{Ampere}       & 2020 & 80, 86, 87    & 80, 86, 87 \\
+                      \texttt{Ada Lovelace} & 2022 & 89            & 89\\
+                      \texttt{Hopper}       & 2022 & 90, 90a       & 90, 90a \\
+                   \hline
+            \end{tabular}
+         \end{center}
+         \caption{\small{Some of the recent CUDA architectures (10/08/2024)}}
+      \end{table}
+\end{frame}
+
+
+% Finding the Compute Capability of GPU devices
+\begin{frame}
+	\frametitle{Retrieval of the Compute Compability (CC)}
+      You can:	
+      \begin{enumerate}
+	      \item write some basic \texttt{C}/\CC\ code \footnote{Already available in \texttt{src/devicequery}.\\
+		      \hspace{4ex}The name of the corresponding executable is \texttt{devinfo}}. 
+   	    relying on the following \texttt{CUDA} APIs:\\
+   	      \begin{itemize}    
+  	         \item \lstinline[style=MyCudaStyle]|cudaGetDeviceCount(int *tot)|: \\
+	  	       returns the number of devices on the localhost.
+   	         \item \lstinline[style=MyCudaStyle]|cudaGetDeviceProperties(cudaDeviceProp *p, int idev)|: \\
+		       returns information about the compute-device \lstinline[style=MyCudaStyle]|idev|.
+              \end{itemize}
+          \item use existing tools, e.\,g.\,\texttt{nvaccelinfo} 
+		(part of \href{https://developer.nvidia.com/hpc-sdk}{NVIDIA HPC SDK}) 
+
+          \item \textbf{\textcolor{orange}{Note:}}\\
+               The \texttt{nvidia-smi} executable displays the architecture \\ 
+		      but not the CC of the device(s): \\
+               \texttt{nvidia-smi -q}		      
+      \end{enumerate}
+\end{frame}	
+
+
+% Use of devinfo (based on my Own Code to be found in src/querydevice)
+\begin{frame}
+   \frametitle{Retrieval of CC through some simple CUDA APIs}
+     \begin{columns}
+        \column{0.70\textwidth}
+    \begin{figure}[H]
+       \centering
+          \includegraphics[width=0.70\textwidth]{./img/devinfo.png}
+	    \caption{\small{\texttt{devinfo} based on a few CUDA APIs}}
+     \end{figure}
+     \end{columns}
+\end{frame}
+
+
+% Use of nvaccelinfo
+\begin{frame}
+	\frametitle{Retrieval of CC using \texttt{nvaccelinfo}}
+     \begin{columns}
+        \column{0.75\textwidth}
+    \begin{figure}[H]
+       \centering
+          \includegraphics[width=0.75\textwidth]{./img/nvaccelinfo.png}
+	    \caption{\small{Use of \texttt{nvaccelinfo} to retrieve \texttt{compute\_}}}
+    \end{figure}
+     \end{columns}
+\end{frame}
+
+
+% Use of nvidia-smi
+\begin{frame}
+        \frametitle{Use of \texttt{nvidia-smi}}
+     \begin{columns}
+        \column{0.85\textwidth}
+    \begin{figure}[H]
+       \centering
+          \includegraphics[width=0.85\textwidth]{./img/nvidia-smi.png}
+          \caption{\small{\texttt{nvidia-smi}}}
+    \end{figure}
+     \end{columns}
+\end{frame}
+
 
 
 %   nvprof, nvsight, cuda-gdb
