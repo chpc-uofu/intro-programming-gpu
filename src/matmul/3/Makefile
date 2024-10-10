@@ -7,7 +7,7 @@ CUFLAGS= -O2 -arch=compute_70 -code=sm_70 -I./include
 CPPFLAGS= -Dcheck
 LDFLAGS= -arch=compute_70 -code=sm_70
 
-mul: aux.o main.o mul.o 
+$(EXE): aux.o main.o mul.o 
 	$(CC) $(LDFLAGS) -o $(EXE) aux.o main.o mul.o
 
 aux.o:aux.cc
