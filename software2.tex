@@ -1,6 +1,6 @@
 % Matrix Multiplication
 %   consists of concepts of threads.
-\subsection{Case study: matrix mul.}
+\subsection{Case study: matrix multiplication}
 % Step 1: consists of the concept of a kernel (__device__,__global__,..), threads
 %         and how to transfer the data from the GPU and CPU. 
 %         cudaMalloc, cudaMallocManaged (unified memory)
@@ -103,7 +103,7 @@
 %   introducing -compute, -arch
 \subsection{Building CUDA applications \& useful env. variables} 
 \begin{frame}
-   \frametitle{Building CUDA applications}
+   \frametitle{Building/Compiling CUDA applications}
       General scheme:
       \begin{itemize}
          \item Source code for CUDA applications:
@@ -131,12 +131,37 @@
 	 \item \texttt{.cuf}: Suffix for CUDA source file (host code (\texttt{Fortan}) \& device code).
 	 \item \texttt{.ptx}: Suffix for \textbf{P}arallel \textbf{T}hread E\textbf{x}ecution (\texttt{PTX}) files. 
 		 An intermediate representation (similar to assembly for a 
-		 \textbf{\textcolor{blue}{virtual GPU architecture}}).
-		       
+		      \textbf{\textcolor{blue}{virtual GPU architecture}}\footnote{Virtual architectures 
+		      bear the \quotes{\texttt{compute\_}} \textbf{\textcolor{green}{prefix}} e.\,g.\,\quotes{\texttt{compute\_70}}.}
 	 \item \texttt{.cubin}: Suffix for the \textbf{CU}DA device \textbf{bin}ary 
-		 file for a \textbf{\textcolor{blue}{real GPU architecture}}.
+		 file pertaining to a \textbf{\textcolor{blue}{real GPU architecture}}\footnote{Real (physical) architectures
+		      bear the \quotes{\texttt{sm\_}} \textbf{\textcolor{green}{prefix}} e.\,g.\,\quotes{\texttt{sm\_70}}.\\
+		      \hspace{4ex}\textcolor{orange}{Memento}: \quotes{\texttt{sm}} stands 
+		      for the physical streaming multiprocessor.}
 	 \item \texttt{fatbin}: Multiple \texttt{PTX} [\& \texttt{cubin}] files are merged into a \texttt{fatbin} file.
       \end{itemize}
+\end{frame}	
+
+% https://docs.nvidia.com/cuda/cuda-compiler-driver-nvcc/index.html#gpu-compilation
+\begin{frame}
+   \frametitle{Some recent CUDA Architectures}
+      \begin{table}[H]
+         \begin{center}
+            \begin{tabular}{c|c|c|c}
+		    Architecture            & Year & \texttt{compute\_} & \texttt{sm\_} \\
+	           \hline
+		      \texttt{Maxwell}      & 2014 & 50, 52, 53    & 50, 52, 53   \\ 
+		      \texttt{Pascal}       & 2016 & 60, 61, 62    & 60, 61, 62 \\
+		      \texttt{Volta}        & 2017 & 70, 72        & 70, 72 \\
+		      \texttt{Turing}       & 2018 & 75            & 75 \\
+		      \texttt{Ampere}       & 2020 & 80, 86, 87    & 80, 86, 87 \\
+		      \texttt{Ada Lovelace} & 2022 & 89            & 89\\
+		      \texttt{Hopper}       & 2022 & 90, 90a       & 90, 90a \\
+	           \hline
+            \end{tabular}
+         \end{center}
+         \caption{\small{Some of the recent CUDA architectures (10/08/2024)}}	      
+      \end{table}
 \end{frame}	
 
 
@@ -152,6 +177,20 @@
         \end{columns}
 \end{frame}     
 
+
+% Still to be done
+
+\begin{frame}
+   \frametitle{In praxi}
+      \begin{itemize}  	
+         \item What are the existing CUDA architectures?
+         \item How find the architecture of a machine?
+         \item How to build for a particular architecture?
+         \item How to build for multiple architectures?		 
+      \end{itemize} 
+\end{frame}
+
+
 %   nvprof, nvsight, cuda-gdb
 \subsection{Profiling \& debugging}
 \begin{frame}
@@ -162,6 +201,7 @@
 	 \item its own debugger: \href{https://docs.nvidia.com/nsight-visual-studio-edition/cuda-debugger/}{\texttt{nvsight}}
       \end{itemize}		 
 \end{frame}
+
 
 \begin{frame}
    \frametitle{Profiling \texttt{mul3} using nvprof}
@@ -212,14 +252,17 @@
          \item Similar to CUDA
    	    \begin{itemize}
 	       \item \href{https://www.amd.com/en/products/software/rocm.html}{\textbf{\textcolor{green}{ROCM}}} (AMD)
- 	       \item \href{https://www.khronos.org/opencl/}{\textbf{\textcolor{green}{OpenCL}}} (Parallel Prog. of Heterogeneous Systems)			 
   	    \end{itemize} 
           \item \href{https://www.openacc.org/}{\textbf{\textcolor{green}{OpenACC}}} (use of directives (cfr. \texttt{OpenMP})
              \begin{itemize}
                 \item GCC: supports OpenACC for NVIDIA  \& AMD GPUs. 
                 \item NVIDIA HPC SDK (formerly PGI)
                 \item Sourcery Codebench (AMD GPU) % https://www.openacc.org/tools/sourcery-codebench 			
-	     \end{itemize}		     
+	     \end{itemize}
+          \item Higher-level abstractions
+             \begin{itemize}
+		\item \href{https://www.kokkos.org/about/core/}{\textbf{\textcolor{green}{Kokkos}}} (prog. model for parallel algorithms for many-core chips)
+             \end{itemize}
       \end{itemize}
 \end{frame}	
 

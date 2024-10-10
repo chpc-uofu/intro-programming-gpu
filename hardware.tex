@@ -23,13 +23,13 @@
 %  Will be succeeded by the Rubin generation (R100/R200)
 %    https://blogs.nvidia.com/blog/computex-2024-jensen-huang/
 
-\subsection{Streaming multiprocessor (SMP)}
+\subsection{Streaming multiprocessor (SM)}
 \begin{frame}
-\frametitle{Streaming Multiprocessor (SMP)}
+\frametitle{Streaming Multiprocessor (SM)}
 \begin{itemize}
 \item GPU device connected to the CPU by a PCIe bus. 
-\item each GPU device contains an array (\textcolor{red}{$\mathbf{x}$}) of Streaming Multiprocessors \textbf{(SMP)}.
-\item each SMP has:
+\item each GPU device contains an array (\textcolor{red}{$\mathbf{x}$}) of Streaming Multiprocessors \textbf{(SM)}.
+\item each SM has:
 \begin{itemize}
    \item a Single-Instruction Multiple-Thread (\texttt{SIMT}) Architecture.
    \item contains \textcolor{red}{$\mathbf{y}$} regular cores and [\textcolor{red}{$\mathbf{z}$} tensor cores].
@@ -40,13 +40,13 @@
 	   \item \texttt{NVIDIA A100-PCIE-40GB} (\textit{notch293})
          \begin{itemize}
             \item global memory: $40$ GB.			 
-            \item $108$ SMPs, $64$ Cores/SMP, $4$ Tensor Cores/SMP.
+            \item $108$ SMs, $64$ Cores/SM, $4$ Tensor Cores/SM.
             \item GPU Max. Clock Rate: $1.41$ GHz.
          \end{itemize}		   
  \item \texttt{NVIDIA H100 SXM5 NVL} (\textit{grn008})	
          \begin{itemize}
             \item global memory: $93$ GB.			 
-            \item $132$ SMPs, $128$ Cores/SMP, $4$ Tensor Cores/SMP.
+            \item $132$ SMs, $128$ Cores/SM, $4$ Tensor Cores/SM.
 	    \item GPU Max. Clock Rate: $1.78$ GHz. 
          \end{itemize}
    \end{itemize}		   
@@ -55,13 +55,13 @@
 
 % NOTE: 
 \begin{frame}
-	\frametitle{\texttt{NVIDIA GH100 SMP}} 
+	\frametitle{\texttt{NVIDIA GH100 SM}} 
     \begin{columns}
 	\column{0.50\textwidth}
     \begin{figure}[H]
        \centering
 	    \includegraphics[width=0.80\textwidth]{./img/H100-Streaming-Multiprocessor-SM-1104x1536.png}
-	    \caption{\small{GH100 SMP.}}
+	    \caption{\small{GH100 SM}}
      \end{figure}
      \end{columns}
 \end{frame}
@@ -73,7 +73,7 @@
     \begin{figure}[H]
        \centering
 	    \includegraphics[width=0.90\textwidth]{./img/Full-H100-GPU-with-144-SMs-1536x686.png}
-	    \caption{\small{NVIDIA GH100 Full Device ($144$ SMPs).}}
+	    \caption{\small{NVIDIA GH100 Full Device ($144$ SMs).}}
      \end{figure}
      \end{columns}
 \end{frame}
@@ -82,7 +82,7 @@
 \begin{frame}
 \frametitle{GPU Threads - Warps}	
 \begin{itemize}
-  \item Each SMP:	
+  \item Each SM:	
   \begin{itemize}
      \item generates, schedules, executes threads in batches of $32$ threads.
      \item \textbf{WARP}: a batch of $32$ threads
