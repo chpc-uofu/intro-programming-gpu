@@ -160,21 +160,27 @@
    \frametitle{In praxi,}
       We will now address the following questions:
       \begin{itemize}  	
-         \item What are the recent CUDA architectures?
-	 \item How to find the compute capability (CC) of a device?
-         \item How to build an executable for a particular architecture?
-         \item How to build an executable for multiple architectures?		 
+         \item What are the recent CUDA architectures
+	 \item How to find the compute capability (CC) of a device
+         \item How to build an executable for a particular device.
+         \item How to build an executable for multiple architectures
       \end{itemize} 
 \end{frame}
 
 
 % https://docs.nvidia.com/cuda/cuda-compiler-driver-nvcc/index.html#gpu-compilation
 \begin{frame}
-  \frametitle{Recent CUDA Architectures}
+  \frametitle{Recent CUDA Architectures/Generations}
+      \begin{itemize}
+	 \item NVIDA GPU: $xy$  $x$:generation (major) $y$: minor
+         \item new generation: major improvement in functionality/chip 
+	 \item \textbf{binary} compatibility is \textbf{NOT} garantueed among generations.		 
+      \end{itemize}		      
       \begin{table}[H]
          \begin{center}
             \begin{tabular}{c|c|c|c}
-                    Architecture            & Year & \texttt{compute\_} & \texttt{sm\_} \\
+		    \multirow{2}{*} \texttt{Architecture/}  & Year & \texttt{compute\_} & \texttt{sm\_} \\
+				    \texttt{Generation}     &      & (\textit{virtual}) & (\textit{real}) \\
                    \hline
                       \texttt{Maxwell}      & 2014 & 50, 52, 53    & 50, 52, 53   \\
                       \texttt{Pascal}       & 2016 & 60, 61, 62    & 60, 61, 62 \\
@@ -191,7 +197,7 @@
 \end{frame}
 
 
-% Finding the Compute Capability of GPU devices
+% Finding the Compute Capability (CC) of GPU devices
 \begin{frame}
 	\frametitle{Retrieval of the Compute Compability (CC)}
       You can:	
@@ -257,6 +263,54 @@
      \end{columns}
 \end{frame}
 
+
+
+\begin{frame}
+   \frametitle{Compiling your code for a particular device/devices}
+      \begin{itemize}
+         \item Compilation goes in $2$ steps:
+            \begin{enumerate}
+		    \item \texttt{PTX} representation: generic assembly instructions for a \\ 
+			    \textit{virtual} (\textcolor{green}{\textbf{\texttt{compute\_}}} prefix) GPU architecture.\\
+			    The resulting \texttt{.ptx} file is human readable (\textbf{text} file).
+		    \item \texttt{Binary generation}: generation of an \textbf{object} file for the \\
+			    \textit{real} (\textbf{\textcolor{green}{\texttt{sm\_}}} prefix) 
+			    GPU architecture (based on the \texttt{PTX} file).		    
+            \end{enumerate}
+         \item \texttt{-arch}/\texttt{-code} flags
+            \begin{itemize}
+	       \item \texttt{--gpu-architecture|-arch <arch>}: specifies the name of \\ 
+		       $1$ \textit{virtual} GPU architecture for which the code needs to be compiled.\\
+			  e.\,g.\,\texttt{-arch=compute\_50}   
+	       \item \texttt{--gpu-code|-code <arch>}: specifies the name(s) of the \textit{real}
+			  GPU architecture(s) for which the binary needs to be compiled.\\
+			    e.\,g.\,\texttt{-code=sm\_52}  
+	    \end{itemize} 
+      \end{itemize} 
+\end{frame}
+
+% See also:https://docs.nvidia.com/cuda/archive/11.6.1/cuda-compiler-driver-nvcc/index.html
+\begin{frame}
+    \frametitle{Compiling your code (cont.)}
+      \begin{itemize}
+
+         \item Therefore, choose $1$ virtual architecture and the accompanying real architectures\\
+                         e.\,g.\, \texttt{-arch=compute\_50 -code=sm\_50,sm\_51,sm\_52}\\
+               \begin{itemize}
+   	          \item \texttt{PTX} file generated for the \texttt{compute\_50} (\textit{virtual}) arch.
+	          \item \textbf{fatbinary} object created for the (\texttt{real}) arch. \texttt{sm\_50,sm\_51,sm\_52}        
+               \end{itemize}
+
+         \item \texttt{--generate-code|-gencode arch=<arch>,code=<code> \ldots} 
+             \begin{itemize}		 
+		     \item \textbf{\textcolor{green}{Generalization}} of the previous construct:\\
+			   \texttt{--gpu-architecture=<arch> --gpu-code=<code>}.
+		     \item allows the creation of binaries for different architectures.
+	             \item example:
+			     \lstinputlisting[basicstyle=\tiny,language=bash]{./latexinc/cuflags.txt}     
+	     \end{itemize}
+      \end{itemize}
+\end{frame}
 
 
 %   nvprof, nvsight, cuda-gdb
