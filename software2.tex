@@ -110,9 +110,18 @@
 \frametitle{Types of GPU memory}
 \begin{itemize}
    \item \textbf{\textcolor{blue}{global memory}}: (largest, slowest and often the bottleneck).
-   \item \textbf{\textcolor{blue}{shared memory}}: allocated per thread block \& low latency
    \item \textbf{\textcolor{blue}{constant memory}}: cached, read-only
+      \begin{itemize}	   
+	 \item  \lstinline[style=MyCudaStyle]|\_\_constant\_\_|: constant memory space specifier
+      \end{itemize}		      
    \item \textbf{\textcolor{blue}{registers}}: fast, on-chip memory (exclusive to each thread).
+   \item \textbf{\textcolor{blue}{shared memory}}: allocated per thread block \& low latency
+   \begin{itemize}
+      \item \lstinline[style=MyCudaStyle]|\_\_shared\_\_|: shared memory space specifier		   
+      \item \lstinline[style=MyCudaStyle]|\_\_syncthreads()|: barrier function which forces 
+	      all threads in a \\block to wait until all threads have arrived before proceeding.\\
+              (block level synchronization).	
+   \end{itemize}		   
 \end{itemize}
 \end{frame}
 
