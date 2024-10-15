@@ -1,2 +1,2 @@
 # intro-programming-gpu
-Introduction to GPU programming (under construction)
+Introduction to GPU programming (by Wim R.M. Cardoen)
