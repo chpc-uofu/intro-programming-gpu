@@ -5,8 +5,46 @@
 %         and how to transfer the data from the GPU and CPU. 
 %         cudaMalloc, cudaMallocManaged (unified memory)
 \begin{frame}
-	\frametitle{Matrix Mul.: kernel (v.\,$1$)}
-	\textbf{\textcolor{blue}{Case study}}: $P=MxN$ where $P,M,N$ $\in \mathbb{R}^{nxn}$
+   \frametitle{Preliminary notion: matrix storage as a $1$D vector}
+     \begin{columns}
+        \column{0.65\textwidth}
+           \begin{figure}[H]
+              \centering
+              \includegraphics[width=0.65\textwidth]{./img/matrix8x8.png}
+		   \caption{\small{P: $8x8$ Matrix ($d=8$)}}
+           \end{figure}
+     \end{columns}
+     \begin{itemize}
+	     \item $P[i,j]$ is stored as $1$D vector: $P[i*d+j]$ where $i,j\,\in [0,8)$.
+     \end{itemize}		     
+\end{frame}
+
+
+% Matrix multiplication
+\begin{frame}
+   \frametitle{Matrix Multiplication $P=M\,N$}
+      Matrix multiplication: $P=M \; N$ where $M,N \, \in \, \mathbb{R}^{dxd}$  
+      \begin{itemize}
+	   \item $P[i,j] = \displaystyle \sum_{k=0}^{d-1} M[i,k]\;N[k,j]$ 
+  	   \item $M[i,k]$ is stored as: $M[i*d+k]$
+ 	   \item $N[k,j]$ is stored as: $N[k*d+j]$ 		      
+           \item Therefore,
+	      \begin{equation}  
+		      P[i*d+j] =  \sum_{k=0}^{d-1} M[i*d+k]\;N[k*d+j] \label{Eq:MatMul}
+              \end{equation}			  
+      \end{itemize}		      
+\end{frame}	
+
+
+\begin{frame}
+   \frametitle{Matrix Mul.: kernel (v.\,$1$)}
+	\begin{itemize}
+		\item Each Thread (threaIdx) is represented as a $2$D object, i.e.\, 
+		      (\lstinline[style=MyCudaStyle]|threadIdx.x|, \lstinline[style=MyCudaStyle]|threadIdx.y|) 
+			(cfr.\,a point in plane geometry)
+           \item Each Thread calculates only $1$ element of $P$. 			
+        \end{itemize}			
+	Implementation of Eq.\,($1$) using $1$ Block of Threads.	
 	\lstinputlisting[style=MyCudaStyle, basicstyle=\tiny, 
 	                 caption={\texttt{Kernel (v.\,$1$)}}]{./latexinc/matmul/1/mul.cu}
 \end{frame}
