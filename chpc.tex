@@ -80,13 +80,13 @@
 	 \item \href{https://www.chpc.utah.edu/presentations/images-and-pdfs/usinggpuss24f.pdf}{Using GPUs at the CHPC (Presentation by Martin \v{C}uma)}
 	 \item \textbf{\textcolor{orange}{Note:}}
             \begin{itemize}
-		    \item When a GPU job is launched the job runs with its own \href{https://en.wikipedia.org/wiki/Cgroups}{cgroups}.
+		    \item When a GPU job is launched the job runs with its own \href{https://en.wikipedia.org/wiki/Cgroups}{cgroup}.
 		     (limits/accounts for its own resources).
 	     \item When a \$USER has several GPU jobs running on the \textbf{same} node,
-	 	   the \$USER will land in \textbf{one} cgroups belonging to one of his/her jobs
+	 	   the \$USER will land in \textbf{one} cgroup belonging to one of his/her jobs
                    when the \$USER \texttt{ssh}es into the node where these jobs run.\\
 	  	   Therefore, the \$USER can \textbf{not} verify the status of his/her other jobs 
-                   using tools like \texttt{nvidia-smi}.
+                   using tools like \texttt{nvidia-smi} directly.
 	       \item $\Rightarrow$ use, \\\texttt{srun --pty --overlap --jobid \$JOBID /usr/bin/nvidia-smi} \\
 		     where JOBID stands for the jobid.   
             \end{itemize}			    
