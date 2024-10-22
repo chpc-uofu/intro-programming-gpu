@@ -248,7 +248,14 @@
 \begin{frame}
 	\frametitle{Retrieval of the Compute Compability (CC)}
       You can:	
-      \begin{enumerate}
+      \begin{enumerate} 
+	      \item use the cmd \texttt{nvidia-smi} to display the architecture.\\
+		      The cmd \texttt{nvidia-smi} is \textbf{\textcolor{green}{extremely powerful}} tool to query\\ 
+		      the state \& specs of the devices attached to a particular node.\footnote{\textbf{\textcolor{orange}{Note}}: it is 
+		      recommended to
+		      investigate the different flags pertaining to the cmd.}
+              \item use the cmd \texttt{nvaccelinfo}
+                (part of \href{https://developer.nvidia.com/hpc-sdk}{NVIDIA HPC SDK})		        
 	      \item write some basic \texttt{C}/\CC\ code \footnote{Already available in \texttt{src/devicequery}.\\
 		      \hspace{4ex}The name of the corresponding executable is \texttt{devinfo}}. 
    	    relying on the following \texttt{CUDA} APIs:\\
@@ -258,15 +265,36 @@
    	         \item \lstinline[style=MyCudaStyle]|cudaGetDeviceProperties(cudaDeviceProp *p, int idev)|: \\
 		       returns information about the compute-device \lstinline[style=MyCudaStyle]|idev|.
               \end{itemize}
-          \item use existing tools, e.\,g.\,\texttt{nvaccelinfo} 
-		(part of \href{https://developer.nvidia.com/hpc-sdk}{NVIDIA HPC SDK}) 
-
-          \item \textbf{\textcolor{orange}{Note:}}\\
-               The \texttt{nvidia-smi} executable displays the architecture \\ 
-		      but not the CC of the device(s): \\
-               \texttt{nvidia-smi -q}		      
       \end{enumerate}
 \end{frame}	
+
+
+% Use of nvidia-smi to dind the compute capability
+\begin{frame}
+        \frametitle{Use of \texttt{nvidia-smi}}
+     \begin{columns}
+        \column{0.85\textwidth}
+    \begin{figure}[H]
+       \centering
+          \includegraphics[width=0.85\textwidth]{./img/nvidia-smi2.png}
+          \caption{\small{\texttt{nvidia-smi}}}
+    \end{figure}
+     \end{columns}
+\end{frame}
+
+
+% Use of nvaccelinfo
+\begin{frame}
+        \frametitle{Retrieval of CC using \texttt{nvaccelinfo}}
+     \begin{columns}
+        \column{0.75\textwidth}
+    \begin{figure}[H]
+       \centering
+          \includegraphics[width=0.75\textwidth]{./img/nvaccelinfo.png}
+            \caption{\small{Use of \texttt{nvaccelinfo} to retrieve \texttt{compute\_}}}
+    \end{figure}
+     \end{columns}
+\end{frame}
 
 
 % Use of devinfo (based on my Own Code to be found in src/querydevice)
@@ -281,35 +309,6 @@
      \end{figure}
      \end{columns}
 \end{frame}
-
-
-% Use of nvaccelinfo
-\begin{frame}
-	\frametitle{Retrieval of CC using \texttt{nvaccelinfo}}
-     \begin{columns}
-        \column{0.75\textwidth}
-    \begin{figure}[H]
-       \centering
-          \includegraphics[width=0.75\textwidth]{./img/nvaccelinfo.png}
-	    \caption{\small{Use of \texttt{nvaccelinfo} to retrieve \texttt{compute\_}}}
-    \end{figure}
-     \end{columns}
-\end{frame}
-
-
-% Use of nvidia-smi
-\begin{frame}
-        \frametitle{Use of \texttt{nvidia-smi}}
-     \begin{columns}
-        \column{0.85\textwidth}
-    \begin{figure}[H]
-       \centering
-          \includegraphics[width=0.85\textwidth]{./img/nvidia-smi.png}
-          \caption{\small{\texttt{nvidia-smi}}}
-    \end{figure}
-     \end{columns}
-\end{frame}
-
 
 
 \begin{frame}
