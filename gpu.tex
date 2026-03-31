@@ -1,60 +1,58 @@
-\documentclass{beamer}
-\usepackage[latin1]{inputenc}
-%\usetheme{Warsaw}             % Themes are listed here: https://latex-beamer.com/tutorials/beamer-themes/ 
-\usetheme{Madrid}
+% !TeX program = lualatex-dev
+\DocumentMetadata{
+  lang=en-US,
+  pdfversion=2.0,
+  pdfstandard=ua-2,
+  tagging=on,
+}
+\documentclass{ltx-talk}
+\usepackage{unicode-math}   %%important
 \usepackage{multirow}
 \usepackage{listings}
+\usepackage{booktabs}
 \definecolor{links}{HTML}{2A1B81}
-\hypersetup{colorlinks,linkcolor=,urlcolor=links}
-\newcommand{\CC}{\texttt{C}\nolinebreak\hspace{-.05em}\raisebox{.4ex}{\tiny\bf +}\nolinebreak\hspace{-.10em}\raisebox{.4ex}{\tiny\bf +}}
-\newcommand{\quotes}[1]{``#1''}
-
-\AtBeginSection[]{
-  \begin{frame}
-  \vfill
-  \centering
-  \begin{beamercolorbox}[sep=8pt,center,shadow=true,rounded=true]{title}
-    \usebeamerfont{title}\insertsectionhead\par%
-  \end{beamercolorbox}
-  \vfill
-  \end{frame}
-}
-
 \definecolor{BrickRed}{rgb}{0.8,0.25,0.33}
 \definecolor{ForestGreen}{rgb}{0.13,0.55,0.13}
 \definecolor{RoyalBlue}{rgb}{0.25,0.41,0.88}
 
+\hypersetup{
+  colorlinks=true,
+  linkcolor=black,
+  urlcolor=links,
+  citecolor=black
+}
+
 \lstdefinestyle{MyCudaStyle}{
-  %backgroundcolor=\color{white},
   basicstyle=\small\ttfamily,
-  %breakatwhitespace=false,
-  %breaklines=true,
   morekeywords={None},
   captionpos=b,
-  commentstyle=\color{RoyalBlue},   % comment style
+  commentstyle=\color{RoyalBlue},
   frame=single,
-  keywordstyle=\color{ForestGreen}\bfseries,      % keyword style
+  keywordstyle=\color{ForestGreen}\bfseries,
   language=C,
   showstringspaces=false,
   stringstyle=\color{BrickRed},
   emph={%
-        cudaFree, cudaMalloc, cudaError\_t, cudaSuccess, 
-	size\_t,
-	cudaMemcpy, cudaMemcpyKind,
-	cudaMemcpyHostToHost, cudaMemcpyHostToDevice, 
-	cudaMemcpyDeviceToHost, cudaMemcpyDeviceToDevice,
-	\_\_global\_\_, \_\_device\_\_ ,\_\_host\_\_,<<<,>>>,
-	\_\_constant\_\_,
-	dim3,\_\_shared\_\_,\_\_syncthreads,
-	uint3,gridDim,blockIdx,blockDim, 
-	threadIdx.x,threadIdx.y,threadIdx.z,threadIdx,
-        cudaGetDeviceCount,cudaGetDeviceProperties,cudaDeviceProp, 
-	%
+        cudaFree, cudaMalloc, cudaError_t, cudaSuccess,
+        size_t,
+        cudaMemcpy, cudaMemcpyKind,
+        cudaMemcpyHostToHost, cudaMemcpyHostToDevice,
+        cudaMemcpyDeviceToHost, cudaMemcpyDeviceToDevice,
+        __global__, __device__, __host__,
+        __constant__,
+        dim3, __shared__, __syncthreads,
+        uint3, gridDim, blockIdx, blockDim,
+        threadIdx,
+        cudaGetDeviceCount, cudaGetDeviceProperties, cudaDeviceProp,
         }, emphstyle={\color{ForestGreen}\bfseries}
 }
 
+\newcommand{\quotes}[1]{``#1''}
+\newcommand{\CC}{C++}
+\NewEnvironmentCopy{Frame}{frame*}
+\usepackage{fancyvrb}
+
 \title{Introduction to GPU Programming}
-%\subtitle{}
 \author{Wim R.M. Cardoen}
 \institute{Center of High-Performance Computing (CHPC) \\ University of Utah}
 \date{November 3, 2025}
@@ -70,7 +68,7 @@
 \include{hardware}      % GPU Architecture
 \include{software}      % Software
 \include{software2}
-\include{chpc}          % Use of GPUs at the CHPC
+\include{chpc}         % Use of GPUs at the CHPC
 
 % --- END ---
 \include{question}      % Questions

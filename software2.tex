@@ -1,451 +1,344 @@
 % Matrix Multiplication
-%   consists of concepts of threads.
 \subsection{Case study: matrix multiplication}
-% Step 1: consists of the concept of a kernel (__device__,__global__,..), threads
-%         and how to transfer the data from the GPU and CPU. 
-%         cudaMalloc, cudaMallocManaged (unified memory)
-\begin{frame}
-   \frametitle{Preliminary notion: matrix storage as a $1$D vector}
-     \begin{columns}
-        \column{0.65\textwidth}
-           \begin{figure}[H]
-              \centering
-              \includegraphics[width=0.65\textwidth]{./img/matrix8x8.png}
-		   \caption{\small{P: $8x8$ Matrix ($d=8$)}}
-           \end{figure}
-     \end{columns}
-     \begin{itemize}
-	     \item $P[i,j]$ is stored as $1$D vector: $P[i*d+j]$ where $i,j\,\in [0,8)$.
-     \end{itemize}		     
-\end{frame}
-
-
-% Matrix multiplication
-\begin{frame}
-   \frametitle{Matrix Multiplication $P=M\,N$}
-      Matrix multiplication: $P=M \; N$ where $M,N \, \in \, \mathbb{R}^{dxd}$  
-      \begin{itemize}
-	   \item $P[i,j] = \displaystyle \sum_{k=0}^{d-1} M[i,k]\;N[k,j]$ 
-  	   \item $M[i,k]$ is stored as: $M[i*d+k]$
- 	   \item $N[k,j]$ is stored as: $N[k*d+j]$ 		      
-           \item Therefore,
-	      \begin{equation}  
-		      P[i*d+j] =  \sum_{k=0}^{d-1} M[i*d+k]\;N[k*d+j] \label{Eq:MatMul}
-              \end{equation}			  
-      \end{itemize}		      
-\end{frame}	
-
 
 \begin{frame}
-   \frametitle{Matrix Mul.: kernel (v.\,$1$)}
-	\begin{itemize}
-		\item Each Thread (threaIdx) is represented as a $2$D object, i.e.\, 
-		      (\lstinline[style=MyCudaStyle]|threadIdx.x|, \lstinline[style=MyCudaStyle]|threadIdx.y|) 
-			(cfr.\,a point in plane geometry)
-           \item Each Thread calculates only $1$ element of $P$. 			
-        \end{itemize}			
-	Implementation of Eq.\,($1$) using $1$ Block of Threads.	
-	\lstinputlisting[style=MyCudaStyle, basicstyle=\tiny, 
-	                 caption={\texttt{Kernel (v.\,$1$)}}]{./latexinc/matmul/1/mul.cu}
+  \frametitle{Preliminary notion: matrix storage as a $1$D vector}
+  \centering
+  \includegraphics[width=0.65\textwidth,
+    alt={Diagram of an 8x8 matrix P stored as a 1D vector}]{./img/matrix8x8.png}
+  \par\small{P: $8\times8$ Matrix ($d=8$)}
+  \begin{itemize}
+    \item $P[i,j]$ is stored as $1$D vector: $P[i*d+j]$ where $i,j\,\in [0,8)$.
+  \end{itemize}
 \end{frame}
 
 \begin{frame}
-	\frametitle{Invoking kernel (v.\,$1$)}
-	\begin{itemize}
-		\item Invoking $1$ Block of Threads
-        \lstinputlisting[style=MyCudaStyle, basicstyle=\tiny, 
-	                 caption={\texttt{Invoking kernel (v.\,$1$)}}]{./latexinc/matmul/1/main-sel.cu}
-        \end{itemize}			 
-\end{frame}
-
-% Step 2: Kernel using more than 1 block of threads
-%  
-\begin{frame}
-	\frametitle{Mat. Mul (v.$2$): Grid of $2$D Blocks}
-      \begin{itemize}
-	 \item \lstinline[style=MyCudaStyle]{int tx = blockIdx.x*blockDim.x + threadIdx.x;} 		      
-	 \item \lstinline[style=MyCudaStyle]{int ty = blockIdx.y*blockDim.y + threadIdx.y;} 		      
-      \end{itemize}		      
-      \begin{columns}
-        \column{0.50\textwidth}
-           \begin{figure}[H]
-              \centering
-              \includegraphics[width=0.75\textwidth]{./img/BlockGrid.eps}
-              \caption{\small{$2$D-Grid of $2$D-Blocks of Threads}}
-           \end{figure}
-     \end{columns}
+  \frametitle{Matrix Multiplication $P=M\,N$}
+  Matrix multiplication: $P=M \; N$ where $M,N \, \in \, \mathbb{R}^{d\times d}$
+  \begin{itemize}
+    \item $P[i,j] = \displaystyle \sum_{k=0}^{d-1} M[i,k]\;N[k,j]$
+    \item $M[i,k]$ is stored as: $M[i*d+k]$
+    \item $N[k,j]$ is stored as: $N[k*d+j]$
+    \item Therefore,
+          \begin{equation}
+            P[i*d+j] = \sum_{k=0}^{d-1} M[i*d+k]\;N[k*d+j] \label{Eq:MatMul}
+          \end{equation}
+  \end{itemize}
 \end{frame}
 
 \begin{frame}
-	\frametitle{Matrix Mul.: visualization (v.\,$2$)}
-      \begin{columns}
-        \column{0.85\textwidth}
-           \begin{figure}[H]
-              \centering
-              \includegraphics[width=0.85\textwidth]{./img/mulB.jpg}
-		   \caption{\small{Matrix Mul. ($2$D Grid)}}
-           \end{figure}
-     \end{columns}
-\end{frame}
-
-
-\begin{frame}
-        \frametitle{Matrix Mul.: kernel (v.\,$2$)}
-        \lstinputlisting[style=MyCudaStyle, basicstyle=\tiny,
-                         caption={\texttt{Kernel (v.\,$2$)}}]{./latexinc/matmul/2/mul.cu}
+  \frametitle{Matrix Mul.: kernel (v.\,$1$)}
+  \begin{itemize}
+    \item Each Thread (\texttt{threadIdx}) is a $2$D object:
+          (\texttt{threadIdx.x}, \texttt{threadIdx.y})
+          (cfr.\ a point in plane geometry).
+    \item Each Thread calculates only $1$ element of $P$.
+  \end{itemize}
+  Implementation of Eq.\,(1) using $1$ Block of Threads.\\
+  \textbf{\textcolor{orange}{Note}}: see \texttt{./latexinc/matmul/1/mul.cu}
 \end{frame}
 
 \begin{frame}
-        \frametitle{Invoking kernel (v.\,$2$)}
-        \begin{itemize}
-                \item Invoking a grid of blocks of threads
-        \lstinputlisting[style=MyCudaStyle, basicstyle=\tiny,
-                         caption={\texttt{Invoking kernel (v.\,$2$)}}]{./latexinc/matmul/2/main-sel.cu}
-        \end{itemize}
+  \frametitle{Invoking kernel (v.\,$1$)}
+  \begin{itemize}
+    \item Invoking $1$ Block of Threads.
+    \item \textbf{\textcolor{orange}{Note}}: see \texttt{./latexinc/matmul/1/main-sel.cu}
+  \end{itemize}
 \end{frame}
 
-
-% Step 3: Introduces the concept of shared memory (+__syncthreads()) 
 \begin{frame}
-\frametitle{Types of GPU memory}
-\begin{itemize}
-   \item \textbf{\textcolor{blue}{global memory}}: (largest, slowest and often the bottleneck).
-   \item \textbf{\textcolor{blue}{constant memory}}: cached, read-only
-      \begin{itemize}	   
-	 \item  \lstinline[style=MyCudaStyle]|\_\_constant\_\_|: constant memory space specifier
-      \end{itemize}		      
-   \item \textbf{\textcolor{blue}{registers}}: fast, on-chip memory (exclusive to each thread).
-   \item \textbf{\textcolor{blue}{shared memory}}: allocated per thread block \& low latency
-   \begin{itemize}
-      \item \lstinline[style=MyCudaStyle]|\_\_shared\_\_|: shared memory space specifier		   
-      \item \lstinline[style=MyCudaStyle]|\_\_syncthreads()|: barrier function which forces 
-	      all threads in a \\block to wait until all threads have arrived before proceeding.\\
-              (block level synchronization).	
-   \end{itemize}		   
-\end{itemize}
+  \frametitle{Mat.\ Mul.\ (v.$2$): Grid of $2$D Blocks}
+  \begin{itemize}
+    \item \texttt{int tx = blockIdx.x*blockDim.x + threadIdx.x;}
+    \item \texttt{int ty = blockIdx.y*blockDim.y + threadIdx.y;}
+  \end{itemize}
+  \centering
+  \includegraphics[width=0.50\textwidth,
+    alt={Diagram of a 2D grid of 2D blocks of threads}]{./img/BlockGrid.eps}
+  \par\small{$2$D-Grid of $2$D-Blocks of Threads}
 \end{frame}
 
-
 \begin{frame}
-   \frametitle{Matrix Mul.: use of shared memory (v.\,$3$)}
-      \begin{columns}
-        \column{0.85\textwidth}
-           \begin{figure}[H]
-              \centering
-              \includegraphics[width=0.85\textwidth]{./img/mulC.jpg}
-                   \caption{\small{Matrix Mul.: use of shared memory}}
-           \end{figure}
-     \end{columns}
+  \frametitle{Matrix Mul.: visualization (v.\,$2$)}
+  \centering
+  \includegraphics[width=0.85\textwidth,
+    alt={Visualization of matrix multiplication using a 2D grid}]{./img/mulB.jpg}
+  \par\small{Matrix Mul.\ ($2$D Grid)}
 \end{frame}
 
-	
 \begin{frame}
-        \frametitle{Matrix Mul.: kernel (v.\,$3$) - use of shared memory}
-        \lstinputlisting[style=MyCudaStyle, basicstyle=\tiny,
-                         caption={\texttt{Kernel (v.\,$3$)}}]{./latexinc/matmul/3/mul.cu}
+  \frametitle{Matrix Mul.: kernel (v.\,$2$)}
+  \textbf{\textcolor{orange}{Note}}: see \texttt{./latexinc/matmul/2/mul.cu}
 \end{frame}
 
-
-% Compilation of the CUDA code
-%   introducing -compute, -arch
-\subsection{Building CUDA applications \& useful env. variables} 
 \begin{frame}
-   \frametitle{Building/Compiling CUDA applications}
-      General scheme:
-      \begin{itemize}
-         \item Source code for CUDA applications:
-            \begin{itemize}		 
-	       \item \texttt{C}/\CC\ host code with extensions to deal with the device(s). 
-	       \item Other programming languages are allowed e.g. \texttt{Fortran} 
-            \end{itemize}	
-         \item Primo: \textbf{\textcolor{green}{separate}} device functions from host code.
-         \item \textbf{\textcolor{green}{Device code}}: preprocessing, compilation 
-	       with the NVIDIA compiler (\texttt{nvcc}).		 
-         \item \textbf{\textcolor{green}{Host code}}: preprocessed, compiled with a host (\texttt{C}/\CC) 
-	       compiler e.\,g.\,(\texttt{gcc, g++, icc, icpc, \ldots})
-	 \item Compiled device functions are \textbf{\textcolor{green}{embedded}} as \texttt{fatbinary} 
-	       images in the host object file.
-         \item \textbf{\textcolor{green}{Linking stage}}: adding CUDA runtime libraries 
-	       to the host object file to create an executable.
-      \end{itemize}		      
+  \frametitle{Invoking kernel (v.\,$2$)}
+  \begin{itemize}
+    \item Invoking a grid of blocks of threads.
+    \item \textbf{\textcolor{orange}{Note}}: see \texttt{./latexinc/matmul/2/main-sel.cu}
+  \end{itemize}
 \end{frame}
 
-
 \begin{frame}
-   \frametitle{Further concepts}
-      \begin{itemize}
-	 \item \texttt{.cu} : Suffix for CUDA source file (host code (\texttt{C},\CC) \& device code).
-	 \item \texttt{.cuf}: Suffix for CUDA source file (host code (\texttt{Fortan}) \& device code).
-	 \item \texttt{.ptx}: Suffix for \textbf{P}arallel \textbf{T}hread E\textbf{x}ecution (\texttt{PTX}) files. 
-		 An intermediate representation (similar to assembly for a 
-		      \textbf{\textcolor{blue}{virtual GPU architecture}}\footnote{Virtual architectures 
-		      bear the \quotes{\texttt{compute\_}} \textbf{\textcolor{green}{prefix}} e.\,g.\,\quotes{\texttt{compute\_70}}.}
-	 \item \texttt{.cubin}: Suffix for the \textbf{CU}DA device \textbf{bin}ary 
-		 file pertaining to a \textbf{\textcolor{blue}{real GPU architecture}}\footnote{Real (physical) architectures
-		      bear the \quotes{\texttt{sm\_}} \textbf{\textcolor{green}{prefix}} e.\,g.\,\quotes{\texttt{sm\_70}}.\\
-		      \hspace{4ex}\textcolor{orange}{Memento}: \quotes{\texttt{sm}} stands 
-		      for the physical streaming multiprocessor.}
-	 \item \texttt{fatbin}: Multiple \texttt{PTX} [\& \texttt{cubin}] files are merged into a \texttt{fatbin} file.
-      \end{itemize}
-\end{frame}	
-
-\begin{frame}
-   \frametitle{Compilation trajectory (cont.)}
-      \begin{columns}
-        \column{0.75\textwidth}
-           \begin{figure}[H]
-              \centering
-              \includegraphics[width=0.65\textwidth]{./img/compileTrajectory.png}
-	      \caption{\small{Compilation trajectory}}
-           \end{figure}
-        \end{columns}
-\end{frame}     
-
-
-% Still to be finished
-\begin{frame}
-   \frametitle{In praxi,}
-      We will now address the following questions:
-      \begin{itemize}  	
-         \item What are the recent CUDA architectures
-	 \item How to find the compute capability (CC) of a device
-         \item How to build an executable for a particular device.
-         \item How to build an executable for multiple architectures
-      \end{itemize} 
+  \frametitle{Types of GPU memory}
+  \begin{itemize}
+    \item \textbf{\textcolor{blue}{global memory}}: largest, slowest, often the bottleneck.
+    \item \textbf{\textcolor{blue}{constant memory}}: cached, read-only.
+          \texttt{\_\_constant\_\_}: constant memory space specifier.
+    \item \textbf{\textcolor{blue}{registers}}: fast, on-chip memory (exclusive to each thread).
+    \item \textbf{\textcolor{blue}{shared memory}}: allocated per thread block \& low latency.
+          \texttt{\_\_shared\_\_}: shared memory space specifier.
+          \texttt{\_\_syncthreads()}: barrier function which forces all threads in a
+          block to wait until all threads have arrived before proceeding
+          (block level synchronization).
+  \end{itemize}
 \end{frame}
 
+\begin{frame}
+  \frametitle{Matrix Mul.: use of shared memory (v.\,$3$)}
+  \centering
+  \includegraphics[width=0.85\textwidth,
+    alt={Diagram showing matrix multiplication using shared memory}]{./img/mulC.jpg}
+  \par\small{Matrix Mul.: use of shared memory}
+\end{frame}
 
-% https://docs.nvidia.com/cuda/cuda-compiler-driver-nvcc/index.html#gpu-compilation
+\begin{frame}
+  \frametitle{Matrix Mul.: kernel (v.\,$3$) --- use of shared memory}
+  \textbf{\textcolor{orange}{Note}}: see \texttt{./latexinc/matmul/3/mul.cu}
+\end{frame}
+
+\subsection{Building CUDA applications \& useful env.\ variables}
+
+\begin{frame}
+  \frametitle{Building/Compiling CUDA applications}
+  General scheme:
+  \begin{itemize}
+    \item Source code for CUDA applications:
+          \texttt{C}/\CC\ host code with extensions to deal with the device(s).
+          Other programming languages are allowed e.g.\ \texttt{Fortran}.
+    \item Primo: \textbf{\textcolor{green}{separate}} device functions from host code.
+    \item \textbf{\textcolor{green}{Device code}}: preprocessing, compilation
+          with the NVIDIA compiler (\texttt{nvcc}).
+    \item \textbf{\textcolor{green}{Host code}}: preprocessed, compiled with a host
+          (\texttt{C}/\CC) compiler e.\,g.\ (\texttt{gcc, g++, icc, icpc, \ldots})
+    \item Compiled device functions are \textbf{\textcolor{green}{embedded}} as
+          \texttt{fatbinary} images in the host object file.
+    \item \textbf{\textcolor{green}{Linking stage}}: adding CUDA runtime libraries
+          to the host object file to create an executable.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Further concepts}
+  \begin{itemize}
+    \item \texttt{.cu}: Suffix for CUDA source file (host code (\texttt{C},\CC) \& device code).
+    \item \texttt{.cuf}: Suffix for CUDA source file (host code (\texttt{Fortran}) \& device code).
+    \item \texttt{.ptx}: Suffix for \textbf{P}arallel \textbf{T}hread E\textbf{x}ecution
+          (\texttt{PTX}) files --- an intermediate representation similar to assembly
+          for a \textbf{\textcolor{blue}{virtual GPU architecture}}
+          (prefix: \texttt{compute\_}, e.\,g.\ \texttt{compute\_70}).
+    \item \texttt{.cubin}: Suffix for the \textbf{CU}DA device \textbf{bin}ary file
+          pertaining to a \textbf{\textcolor{blue}{real GPU architecture}}
+          (prefix: \texttt{sm\_}, e.\,g.\ \texttt{sm\_70}).
+          \textcolor{orange}{Memento}: \texttt{sm} stands for the physical streaming multiprocessor.
+    \item \texttt{fatbin}: Multiple \texttt{PTX} [\& \texttt{cubin}] files are merged
+          into a \texttt{fatbin} file.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Compilation trajectory}
+  \centering
+  \includegraphics[width=0.65\textwidth,
+    alt={Diagram showing the CUDA compilation trajectory}]{./img/compileTrajectory.png}
+  \par\small{Compilation trajectory}
+\end{frame}
+
+\begin{frame}
+  \frametitle{In praxi,}
+  We will now address the following questions:
+  \begin{itemize}
+    \item What are the recent CUDA architectures?
+    \item How to find the compute capability (CC) of a device?
+    \item How to build an executable for a particular device?
+    \item How to build an executable for multiple architectures?
+  \end{itemize}
+\end{frame}
+
 \begin{frame}
   \frametitle{Recent CUDA Architectures/Generations}
-      \begin{itemize}
-	 \item NVIDA GPU: $xy$  $x$:generation (major) $y$: minor
-         \item new generation: major improvement in functionality/chip 
-	 \item \textbf{binary} compatibility is \textbf{NOT} garantueed among generations.		 
-      \end{itemize}		      
-      \begin{table}[H]
-         \begin{center}
-            \begin{tabular}{c|c|c|c}
-		    \multirow{2}{*} \texttt{Architecture/}  & Year & \texttt{compute\_} & \texttt{sm\_} \\
-				    \texttt{Generation}     &      & (\textit{virtual}) & (\textit{real}) \\
-                   \hline
-                      \texttt{Maxwell}      & 2014 & 50, 52, 53    & 50, 52, 53   \\
-                      \texttt{Pascal}       & 2016 & 60, 61, 62    & 60, 61, 62 \\
-                      \texttt{Volta}        & 2017 & 70, 72        & 70, 72 \\
-                      \texttt{Turing}       & 2018 & 75            & 75 \\
-                      \texttt{Ampere}       & 2020 & 80, 86, 87    & 80, 86, 87 \\
-                      \texttt{Ada Lovelace} & 2022 & 89            & 89\\
-                      \texttt{Hopper}       & 2022 & 90, 90a       & 90, 90a \\
-		      \texttt{Blackwell}    & 2024 & 100, 100a     & 100,100a \\
-                   \hline
-            \end{tabular}
-         \end{center}
-         \caption{\small{Some of the recent CUDA architectures (10/31/2025)}}
-      \end{table}
+  \begin{itemize}
+    \item NVIDIA GPU: $xy$ where $x$: generation (major), $y$: minor.
+    \item New generation: major improvement in functionality/chip.
+    \item \textbf{Binary} compatibility is \textbf{NOT} guaranteed among generations.
+  \end{itemize}
+  \begin{center}
+    \begin{tabular}{cccc}
+      \toprule
+      Architecture      & Year & \texttt{compute\_} & \texttt{sm\_} \\
+                        &      & (\textit{virtual})  & (\textit{real}) \\
+      \midrule
+      \texttt{Maxwell}      & 2014 & 50, 52, 53    & 50, 52, 53   \\
+      \texttt{Pascal}       & 2016 & 60, 61, 62    & 60, 61, 62   \\
+      \texttt{Volta}        & 2017 & 70, 72        & 70, 72       \\
+      \texttt{Turing}       & 2018 & 75            & 75           \\
+      \texttt{Ampere}       & 2020 & 80, 86, 87    & 80, 86, 87   \\
+      \texttt{Ada Lovelace} & 2022 & 89            & 89           \\
+      \texttt{Hopper}       & 2022 & 90, 90a       & 90, 90a      \\
+      \texttt{Blackwell}    & 2024 & 100, 100a     & 100, 100a    \\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+  \par\small{Some of the recent CUDA architectures (10/31/2025)}
 \end{frame}
 
-
-% Finding the Compute Capability (CC) of GPU devices
 \begin{frame}
-	\frametitle{Retrieval of the Compute Compability (CC)}
-      You can:	
-      \begin{enumerate} 
-	      \item use the cmd \texttt{nvidia-smi} to display the architecture.\\
-		      The cmd \texttt{nvidia-smi} is \textbf{\textcolor{green}{extremely powerful}} tool to query\\ 
-		      the state \& specs of the devices attached to a particular node.\footnote{\textbf{\textcolor{orange}{Note}}: it is 
-		      recommended to
-		      investigate the different flags pertaining to the cmd.}
-              \item use the cmd \texttt{nvaccelinfo}
-                (part of \href{https://developer.nvidia.com/hpc-sdk}{NVIDIA HPC SDK})		        
-	      \item write some basic \texttt{C}/\CC\ code \footnote{Already available in \texttt{src/devicequery}.\\
-		      \hspace{4ex}The name of the corresponding executable is \texttt{devinfo}}. 
-   	    relying on the following \texttt{CUDA} APIs:\\
-   	      \begin{itemize}    
-  	         \item \lstinline[style=MyCudaStyle]|cudaGetDeviceCount(int *tot)|: \\
-	  	       returns the number of devices on the localhost.
-   	         \item \lstinline[style=MyCudaStyle]|cudaGetDeviceProperties(cudaDeviceProp *p, int idev)|: \\
-		       returns information about the compute-device \lstinline[style=MyCudaStyle]|idev|.
-              \end{itemize}
-      \end{enumerate}
-\end{frame}	
-
-
-% Use of nvidia-smi to dind the compute capability
-\begin{frame}
-        \frametitle{Use of \texttt{nvidia-smi}}
-     \begin{columns}
-        \column{0.85\textwidth}
-    \begin{figure}[H]
-       \centering
-          \includegraphics[width=0.85\textwidth]{./img/nvidia-smi2.png}
-          \caption{\small{\texttt{nvidia-smi}}}
-    \end{figure}
-     \end{columns}
+  \frametitle{Retrieval of the Compute Capability (CC)}
+  You can:
+  \begin{enumerate}
+    \item Use \texttt{nvidia-smi} to display the architecture.
+          \texttt{nvidia-smi} is an \textbf{\textcolor{green}{extremely powerful}} tool
+          to query the state \& specs of the devices attached to a node.
+    \item Use \texttt{nvaccelinfo}
+          (part of \href{https://developer.nvidia.com/hpc-sdk}{NVIDIA HPC SDK}).
+    \item Write basic \texttt{C}/\CC\ code relying on CUDA APIs
+          (available in \texttt{src/devicequery}, executable: \texttt{devinfo}):
+          \texttt{cudaGetDeviceCount(int *tot)}: returns number of devices.
+          \texttt{cudaGetDeviceProperties(cudaDeviceProp *p, int idev)}:
+          returns information about device \texttt{idev}.
+  \end{enumerate}
 \end{frame}
 
-
-% Use of nvaccelinfo
 \begin{frame}
-        \frametitle{Retrieval of CC using \texttt{nvaccelinfo}}
-     \begin{columns}
-        \column{0.75\textwidth}
-    \begin{figure}[H]
-       \centering
-          \includegraphics[width=0.75\textwidth]{./img/nvaccelinfo.png}
-            \caption{\small{Use of \texttt{nvaccelinfo} to retrieve \texttt{compute\_}}}
-    \end{figure}
-     \end{columns}
+  \frametitle{Use of \texttt{nvidia-smi}}
+  \centering
+  \includegraphics[width=0.85\textwidth,
+    alt={Screenshot of nvidia-smi output}]{./img/nvidia-smi2.png}
+  \par\small{\texttt{nvidia-smi}}
 \end{frame}
 
-
-% Use of devinfo (based on my Own Code to be found in src/querydevice)
 \begin{frame}
-   \frametitle{Retrieval of CC through some simple CUDA APIs}
-     \begin{columns}
-        \column{0.70\textwidth}
-    \begin{figure}[H]
-       \centering
-          \includegraphics[width=0.70\textwidth]{./img/devinfo.png}
-	    \caption{\small{\texttt{devinfo} based on a few CUDA APIs}}
-     \end{figure}
-     \end{columns}
+  \frametitle{Retrieval of CC using \texttt{nvaccelinfo}}
+  \centering
+  \includegraphics[width=0.75\textwidth,
+    alt={Screenshot of nvaccelinfo output showing compute capability}]{./img/nvaccelinfo.png}
+  \par\small{Use of \texttt{nvaccelinfo} to retrieve \texttt{compute\_}}
 \end{frame}
 
-
 \begin{frame}
-   \frametitle{Compiling your code for a particular device/devices}
-      \begin{itemize}
-         \item Compilation goes in $2$ steps:
-            \begin{enumerate}
-		    \item \texttt{PTX} representation: generic assembly instructions for a \\ 
-			    \textit{virtual} (\textcolor{green}{\textbf{\texttt{compute\_}}} prefix) GPU architecture.\\
-			    The resulting \texttt{.ptx} file is human readable (\textbf{text} file).
-		    \item \texttt{Binary generation}: generation of an \textbf{object} file for the \\
-			    \textit{real} (\textbf{\textcolor{green}{\texttt{sm\_}}} prefix) 
-			    GPU architecture (based on the \texttt{PTX} file).		    
-            \end{enumerate}
-         \item \texttt{-arch}/\texttt{-code} flags
-            \begin{itemize}
-	       \item \texttt{--gpu-architecture|-arch <arch>}: specifies the name of \\ 
-		       $1$ \textit{virtual} GPU architecture for which the code needs to be compiled.\\
-			  e.\,g.\,\texttt{-arch=compute\_50}   
-	       \item \texttt{--gpu-code|-code <arch>}: specifies the name(s) of the \textit{real}
-			  GPU architecture(s) for which the binary needs to be compiled.\\
-			    e.\,g.\,\texttt{-code=sm\_52}  
-	    \end{itemize} 
-      \end{itemize} 
+  \frametitle{Retrieval of CC through some simple CUDA APIs}
+  \centering
+  \includegraphics[width=0.70\textwidth,
+    alt={Screenshot of devinfo output based on CUDA APIs}]{./img/devinfo.png}
+  \par\small{\texttt{devinfo} based on a few CUDA APIs}
 \end{frame}
 
-% See also:https://docs.nvidia.com/cuda/archive/11.6.1/cuda-compiler-driver-nvcc/index.html
 \begin{frame}
-    \frametitle{Compiling your code (cont.)}
-      \begin{itemize}
-
-         \item Therefore, choose $1$ virtual architecture and the accompanying real architectures\\
-                         e.\,g.\, \texttt{-arch=compute\_50 -code=sm\_50,sm\_51,sm\_52}\\
-               \begin{itemize}
-   	          \item \texttt{PTX} file generated for the \texttt{compute\_50} (\textit{virtual}) arch.
-	          \item \textbf{fatbinary} object created for the (\texttt{real}) arch. \texttt{sm\_50,sm\_51,sm\_52}        
-               \end{itemize}
-
-         \item \texttt{--generate-code|-gencode arch=<arch>,code=<code> \ldots} 
-             \begin{itemize}		 
-		     \item \textbf{\textcolor{green}{Generalization}} of the previous construct:\\
-			   \texttt{--gpu-architecture=<arch> --gpu-code=<code>}.
-		     \item allows the creation of binaries for different architectures.
-	             \item example:
-			     \lstinputlisting[basicstyle=\tiny,language=bash]{./latexinc/cuflags.txt}     
-	     \end{itemize}
-      \end{itemize}
+  \frametitle{Compiling your code for a particular device}
+  \begin{itemize}
+    \item Compilation goes in $2$ steps:
+    \item Step 1 --- \texttt{PTX} representation: generic assembly for a
+          \textit{virtual} (\texttt{compute\_}) GPU architecture.
+          The \texttt{.ptx} file is human readable (text file).
+    \item Step 2 --- \texttt{Binary generation}: object file for the
+          \textit{real} (\texttt{sm\_}) GPU architecture (based on the \texttt{PTX} file).
+    \item \texttt{-arch}/\texttt{-code} flags:
+    \item \texttt{--gpu-architecture|-arch <arch>}: specifies $1$ \textit{virtual}
+          GPU architecture, e.\,g.\ \texttt{-arch=compute\_50}.
+    \item \texttt{--gpu-code|-code <arch>}: specifies the \textit{real}
+          GPU architecture(s), e.\,g.\ \texttt{-code=sm\_52}.
+  \end{itemize}
 \end{frame}
 
+\begin{frame}
+  \frametitle{Compiling your code (cont.)}
+  \begin{itemize}
+    \item Choose $1$ virtual architecture and the accompanying real architectures,
+          e.\,g.\ \texttt{-arch=compute\_50 -code=sm\_50,sm\_51,sm\_52}:
+          \texttt{PTX} file generated for \texttt{compute\_50} (\textit{virtual}).
+          \textbf{fatbinary} object created for \texttt{sm\_50,sm\_51,sm\_52} (\textit{real}).
+    \item \texttt{--generate-code|-gencode arch=<arch>,code=<code>}:
+          \textbf{\textcolor{green}{Generalization}} of
+          \texttt{--gpu-architecture=<arch> --gpu-code=<code>}.
+          Allows creation of binaries for different architectures.
+    \item Example: see \texttt{./latexinc/cuflags.txt}
+  \end{itemize}
+\end{frame}
 
-%   nvprof, nvsight, cuda-gdb
 \subsection{Profiling \& debugging}
+
 \begin{frame}
-   \frametitle{Profiling \& debugging} 
-      CUDA SDK comes with:
-      \begin{itemize}	
-         \item its own profiler: \href{https://docs.nvidia.com/cuda/profiler-users-guide/}{\texttt{nvprof}}.  
-	 \item its own debugger: \href{https://docs.nvidia.com/nsight-visual-studio-edition/cuda-debugger/}{\texttt{nvsight}}
-      \end{itemize}		 
+  \frametitle{Profiling \& debugging}
+  CUDA SDK comes with:
+  \begin{itemize}
+    \item Its own profiler:
+          \href{https://docs.nvidia.com/cuda/profiler-users-guide/}{\texttt{nvprof}}.
+    \item Its own debugger:
+          \href{https://docs.nvidia.com/nsight-visual-studio-edition/cuda-debugger/}{\texttt{nvsight}}.
+  \end{itemize}
 \end{frame}
 
-
 \begin{frame}
-   \frametitle{Profiling \texttt{mul3} using nvprof}
-     \begin{columns}
-        \column{0.90\textwidth}
-    \begin{figure}[H]
-       \centering
-          \includegraphics[width=0.95\textwidth]{./img/nvprof-mul3.png}
-          \caption{\small{Profiling \texttt{mul3} on \texttt{notch001}}}
-     \end{figure}
-     \end{columns}
-\end{frame}	
+  \frametitle{Profiling \texttt{mul3} using nvprof}
+  \centering
+  \includegraphics[width=0.90\textwidth,
+    alt={Screenshot of nvprof profiling output for mul3}]{./img/nvprof-mul3.png}
+  \par\small{Profiling \texttt{mul3} on \texttt{notch001}}
+\end{frame}
 
-
-% CUDA Libraries: CUBLAS, CUFFT, CUDNN, MAGMA, CURAND, NCCL
 \subsection{Important CUDA libraries}
+
 \begin{frame}
-   \frametitle{Important CUDA libraries}
-     In order to increase the performance of your code we recommend 
-     to use highly-optimized libraries. Among them, we have:
-     \begin{itemize}
-	\item \href{https://developer.nvidia.com/cublas}{\textbf{\textcolor{green}{cuBLAS}}}: 
-		\textbf{B}asic \textbf{L}inear \textbf{A}lgebra \textbf{S}ubroutines on NVIDIA GPUs.
-	\item \href{https://icl.utk.edu/magma/}{\textbf{\textcolor{green}{MAGMA}}}: 
-		\textbf{M}atrix \textbf{A}lgebra on \textbf{G}PU and \textbf{M}ulti-core \textbf{A}rchitectures. 		
-        \item \href{https://docs.nvidia.com/cuda/pdf/CURAND_Library.pdf}{\textbf{\textcolor{green}{cuRAND}}}: Random Number Generation library.
-        \item \href{https://docs.nvidia.com/cuda/pdf/CUFFT_Library.pdf}{\textbf{\textcolor{green}{cuFFT}}}: 
-		CUDA \textbf{F}ast \textbf{F}ourier \textbf{T}ransform library.
-	\item \href{https://developer.nvidia.com/nccl}{\textbf{\textcolor{green}{NCCL}}}: 
-	  \textbf{N}VIDIA \textbf{C}ollective \textbf{C}ommunications \textbf{L}ibrary. 		
-	\item \href{https://developer.nvidia.com/cudnn}{\textbf{\textcolor{green}{cuDNN}}}: 
-  	  CUDA \textbf{D}eep \textbf{N}eural \textbf{N}etwork library.		
-	\item \href{https://developer.nvidia.com/cutensor}{\textbf{\textcolor{green}{cuTENSOR}}}: GPU-accelerated Tensor Linear Algebra.
-	\item \href{https://developer.nvidia.com/DALI}{\textbf{\textcolor{green}{DALI}}}: NVIDIA \textbf{Da}ta Loading \textbf{Li}brary.
-        \item $\ldots$
-     \end{itemize}
+  \frametitle{Important CUDA libraries}
+  To increase performance, use highly-optimized libraries:
+  \begin{itemize}
+    \item \href{https://developer.nvidia.com/cublas}{\textbf{\textcolor{green}{cuBLAS}}}:
+          \textbf{B}asic \textbf{L}inear \textbf{A}lgebra \textbf{S}ubroutines on NVIDIA GPUs.
+    \item \href{https://icl.utk.edu/magma/}{\textbf{\textcolor{green}{MAGMA}}}:
+          \textbf{M}atrix \textbf{A}lgebra on \textbf{G}PU and \textbf{M}ulti-core \textbf{A}rchitectures.
+    \item \href{https://docs.nvidia.com/cuda/pdf/CURAND_Library.pdf}{\textbf{\textcolor{green}{cuRAND}}}:
+          Random Number Generation library.
+    \item \href{https://docs.nvidia.com/cuda/pdf/CUFFT_Library.pdf}{\textbf{\textcolor{green}{cuFFT}}}:
+          CUDA \textbf{F}ast \textbf{F}ourier \textbf{T}ransform library.
+    \item \href{https://developer.nvidia.com/nccl}{\textbf{\textcolor{green}{NCCL}}}:
+          \textbf{N}VIDIA \textbf{C}ollective \textbf{C}ommunications \textbf{L}ibrary.
+    \item \href{https://developer.nvidia.com/cudnn}{\textbf{\textcolor{green}{cuDNN}}}:
+          CUDA \textbf{D}eep \textbf{N}eural \textbf{N}etwork library.
+    \item \href{https://developer.nvidia.com/cutensor}{\textbf{\textcolor{green}{cuTENSOR}}}:
+          GPU-accelerated Tensor Linear Algebra.
+    \item \href{https://developer.nvidia.com/DALI}{\textbf{\textcolor{green}{DALI}}}:
+          NVIDIA \textbf{Da}ta Loading \textbf{Li}brary.
+    \item $\ldots$
+  \end{itemize}
 \end{frame}
 
-
-% Alternatives:
-%  - Within CUDA: CudaFortran, OpenAcc (pragmas)
-%  - Alternatives to CUDA: OpenCL, HIP
-%  - Kokkos
 \subsection{Alternatives to CUDA}
+
 \begin{frame}
-   \frametitle{Alternatives to CUDA}
-      \begin{itemize}
-         \item Similar to CUDA
-   	    \begin{itemize}
-	       \item \href{https://www.amd.com/en/products/software/rocm.html}{\textbf{\textcolor{green}{ROCM}}} (AMD)
-  	    \end{itemize} 
-          \item \href{https://www.openacc.org/}{\textbf{\textcolor{green}{OpenACC}}} (use of directives (cfr. \texttt{OpenMP})
-             \begin{itemize}
-                \item GCC: supports OpenACC for NVIDIA  \& AMD GPUs. 
-                \item NVIDIA HPC SDK (formerly PGI)
-                \item Sourcery Codebench (AMD GPU) % https://www.openacc.org/tools/sourcery-codebench 			
-	     \end{itemize}
-          \item Higher-level abstractions
-             \begin{itemize}
-		\item \href{https://www.kokkos.org/about/core/}{\textbf{\textcolor{green}{Kokkos}}} (prog. model for parallel algorithms for many-core chips)
-             \end{itemize}
-      \end{itemize}
-\end{frame}	
+  \frametitle{Alternatives to CUDA}
+  \begin{itemize}
+    \item Similar to CUDA:
+          \href{https://www.amd.com/en/products/software/rocm.html}{\textbf{\textcolor{green}{ROCM}}} (AMD).
+    \item \href{https://www.openacc.org/}{\textbf{\textcolor{green}{OpenACC}}}
+          (use of directives, cfr.\ \texttt{OpenMP}):
+          GCC supports OpenACC for NVIDIA \& AMD GPUs.
+          NVIDIA HPC SDK (formerly PGI).
+          Sourcery Codebench (AMD GPU).
+    \item Higher-level abstractions:
+          \href{https://www.kokkos.org/about/core/}{\textbf{\textcolor{green}{Kokkos}}}
+          (programming model for parallel algorithms on many-core chips).
+  \end{itemize}
+\end{frame}
 
 \subsection{Links}
-\begin{frame}
-   \frametitle{Links}
-      \begin{itemize}
-         \item \href{https://docs.nvidia.com/cuda/index.html}{CUDA Toolkit Documentation}
-	 \item \href{https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html}{CUDA \CC\, Programming Guide Release $13.0$ 
-		 (10/31/25)}
-	 \item \href{https://docs.nvidia.com/cuda/cuda-c-best-practices-guide/index.html}{CUDA \CC\, Best Practices Guide, Release $13.0$ (10/31/25)}	      
-         \item \href{https://docs.nvidia.com/cuda/cuda-compiler-driver-nvcc/}{NVIDIA CUDA Compiler Driver NVCC, Release $13.0$ (10/31/25)}		 
-         \item \href{https://docs.nvidia.com/cuda/parallel-thread-execution/}{PTX \& ISA Release $9.0$ (10/31/25)}	
-		 
-      \end{itemize}		      
-\end{frame}	
 
+\begin{frame}
+  \frametitle{Links}
+  \begin{itemize}
+    \item \href{https://docs.nvidia.com/cuda/index.html}{CUDA Toolkit Documentation}
+    \item \href{https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html}{CUDA \CC\, Programming Guide Release $13.0$ (10/31/25)}
+    \item \href{https://docs.nvidia.com/cuda/cuda-c-best-practices-guide/index.html}{CUDA \CC\, Best Practices Guide, Release $13.0$ (10/31/25)}
+    \item \href{https://docs.nvidia.com/cuda/cuda-compiler-driver-nvcc/}{NVIDIA CUDA Compiler Driver NVCC, Release $13.0$ (10/31/25)}
+    \item \href{https://docs.nvidia.com/cuda/parallel-thread-execution/}{PTX \& ISA Release $9.0$ (10/31/25)}
+  \end{itemize}
+\end{frame}

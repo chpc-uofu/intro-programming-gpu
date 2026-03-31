@@ -8,86 +8,80 @@
 %   cd bin/x86_64/linux/release
 %   ./deviceQuery
 
-
 % NOTE 2:
 %  Ampere A100:
 %    https://images.nvidia.com/aem-dam/en-zz/Solutions/data-center/nvidia-ampere-architecture-whitepaper.pdf
 %    https://developer.nvidia.com/blog/nvidia-ampere-architecture-in-depth/
-
+%
 %  Hopper H100:
 %    https://developer.nvidia.com/blog/nvidia-hopper-architecture-in-depth/
-
+%
 %  Blackwell B100:
 %    https://resources.nvidia.com/en-us-blackwell-architecture
-
+%
 %  Will be succeeded by the Rubin generation (R100/R200)
 %    https://blogs.nvidia.com/blog/computex-2024-jensen-huang/
 
 \subsection{Streaming multiprocessor (SM)}
-\begin{frame}
-\frametitle{Streaming Multiprocessor (SM)}
-\begin{itemize}
-\item GPU device connected to the CPU by a PCIe bus. 
-\item each GPU device contains an array (\textcolor{red}{$\mathbf{x}$}) of Streaming Multiprocessors \textbf{(SM)}.
-\item each SM has:
-\begin{itemize}
-   \item a Single-Instruction Multiple-Thread (\texttt{SIMT}) Architecture.
-   \item contains \textcolor{red}{$\mathbf{y}$} regular cores and [\textcolor{red}{$\mathbf{z}$} tensor cores].
-\end{itemize} 
-\item scalable: newer generations: increase of \textcolor{red}{$\mathbf{x}$}, \textcolor{red}{$\mathbf{y}$} 
-	and [\textcolor{red}{$\mathbf{z}$}], e.g.:
-   \begin{itemize}
-	   \item \texttt{NVIDIA A100-PCIE-40GB} (\textit{notch293})
-         \begin{itemize}
-            \item global memory: $40$ GB.			 
-            \item $108$ SMs, $64$ Cores/SM, $4$ Tensor Cores/SM.
-            \item GPU Max. Clock Rate: $1.41$ GHz.
-         \end{itemize}		   
- \item \texttt{NVIDIA H100 SXM5 NVL} (\textit{grn008})	
-         \begin{itemize}
-            \item global memory: $93$ GB.			 
-            \item $132$ SMs, $128$ Cores/SM, $4$ Tensor Cores/SM.
-	    \item GPU Max. Clock Rate: $1.78$ GHz. 
-         \end{itemize}
-   \end{itemize}		   
-\end{itemize}
-\end{frame} 
 
-% NOTE: 
 \begin{frame}
-	\frametitle{\texttt{NVIDIA GH100 SM}} 
-    \begin{columns}
-	\column{0.50\textwidth}
-    \begin{figure}[H]
-       \centering
-	    \includegraphics[width=0.80\textwidth]{./img/H100-Streaming-Multiprocessor-SM-1104x1536.png}
-	    \caption{\small{GH100 SM}}
-     \end{figure}
-     \end{columns}
+  \frametitle{Streaming Multiprocessor (SM)}
+  \begin{itemize}
+    \item GPU device connected to the CPU by a PCIe bus.
+    \item Each GPU device contains an array (\textcolor{red}{$\mathbf{x}$}) of
+          Streaming Multiprocessors \textbf{(SM)}.
+    \item Each SM has:
+      \begin{itemize}
+        \item a Single-Instruction Multiple-Thread (\texttt{SIMT}) Architecture.
+        \item \textcolor{red}{$\mathbf{y}$} regular cores and
+              [\textcolor{red}{$\mathbf{z}$} tensor cores].
+      \end{itemize}
+    \item Scalable: newer generations increase \textcolor{red}{$\mathbf{x}$},
+          \textcolor{red}{$\mathbf{y}$} and [\textcolor{red}{$\mathbf{z}$}], e.g.:
+      \begin{itemize}
+        \item \texttt{NVIDIA A100-PCIE-40GB} (\textit{notch293})
+          \begin{itemize}
+            \item Global memory: $40$ GB.
+            \item $108$ SMs, $64$ Cores/SM, $4$ Tensor Cores/SM.
+            \item GPU Max.\ Clock Rate: $1.41$ GHz.
+          \end{itemize}
+        \item \texttt{NVIDIA H100 SXM5 NVL} (\textit{grn008})
+          \begin{itemize}
+            \item Global memory: $93$ GB.
+            \item $132$ SMs, $128$ Cores/SM, $4$ Tensor Cores/SM.
+            \item GPU Max.\ Clock Rate: $1.78$ GHz.
+          \end{itemize}
+      \end{itemize}
+  \end{itemize}
 \end{frame}
 
 \begin{frame}
-        \frametitle{\texttt{NVIDIA GH100 Full Device}}
-    \begin{columns}
-        \column{0.90\textwidth}
-    \begin{figure}[H]
-       \centering
-	    \includegraphics[width=0.90\textwidth]{./img/Full-H100-GPU-with-144-SMs-1536x686.png}
-	    \caption{\small{NVIDIA GH100 Full Device ($144$ SMs).}}
-     \end{figure}
-     \end{columns}
+  \frametitle{\texttt{NVIDIA GH100 SM}}
+  \centering
+  \includegraphics[width=0.50\textwidth,
+    alt={Diagram of the NVIDIA GH100 Streaming Multiprocessor architecture}]{./img/H100-Streaming-Multiprocessor-SM-1104x1536.png}
+  \par\small{GH100 SM}
+\end{frame}
+
+\begin{frame}
+  \frametitle{\texttt{NVIDIA GH100 Full Device}}
+  \centering
+  \includegraphics[width=0.90\textwidth,
+    alt={Diagram of the full NVIDIA GH100 GPU with 144 Streaming Multiprocessors}]{./img/Full-H100-GPU-with-144-SMs-1536x686.png}
+  \par\small{NVIDIA GH100 Full Device ($144$ SMs).}
 \end{frame}
 
 \subsection{Warps}
+
 \begin{frame}
-\frametitle{GPU Threads - Warps}	
-\begin{itemize}
-  \item Each SM:	
+  \frametitle{GPU Threads --- Warps}
   \begin{itemize}
-     \item generates, schedules, executes threads in batches of $32$ threads.
-     \item \textbf{WARP}: a batch of $32$ threads
+    \item Each SM:
+      \begin{itemize}
+        \item generates, schedules, and executes threads in batches of $32$ threads.
+        \item \textbf{WARP}: a batch of $32$ threads.
+      \end{itemize}
+    \item Each thread in a WARP executes the same instructions but runs its own ``path''.
+    \item If threads within a WARP diverge, the threads become inactive/disabled.
   \end{itemize}
-  \item each thread in a WARP executes the same instructions but runs its own "path".
-  \item if threads within a WARP diverge, the threads become inactive/disabled.
-\end{itemize}	   
-\end{frame} 
+\end{frame}
